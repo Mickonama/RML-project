@@ -1,0 +1,194 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix rml: <http://semweb.mmlab.be/ns/rml#>.
+@prefix ql: <http://semweb.mmlab.be/ns/ql#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix lcc-3166-1: <https://www.omg.org/spec/LCC/Countries/ISO3166-1-CountryCodes/> .
+@prefix lcc-lr: <https://www.omg.org/spec/LCC/Languages/LanguageRepresentation/> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix ppl: <http://powerplant.example.com/schema/>.
+@base <http://powerplant.example.com/>.
+
+
+<#ContientMapping> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "resources/country-and-continent-codes-list-csv.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [
+    rr:template "http://powerplant.example.com/{Continent_Name}";
+    rr:class ppl:Continent
+  ].
+
+<#CapitalCityMapping> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "resources/processed/CountryData.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [
+    rr:template "http://powerplant.example.com/{Capital/Major City}";
+    rr:class ppl:City
+   ].
+
+<#CityMapping> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "resources/processed/CountryData.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [
+    rr:template "http://powerplant.example.com/{Largest city}";
+    rr:class ppl:City
+  ].
+
+
+<#CountryMapping> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "resources/processed/CountryData.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [
+    rr:template "http://powerplant.example.com/{Country}";
+    rr:class ppl:Country
+  ];
+
+    rr:predicateObjectMap [
+    rr:predicate ppl:isPartOf;
+    rr:objectMap [
+        rr:parentTriplesMap <#ContientMapping>;
+        rr:joinCondition[
+        rr:child "Abbreviation";
+        rr:parent "Two_Letter_Country_Code"]
+       ]
+    ];
+
+   rr:predicateObjectMap [
+    rr:predicate ppl:hasCapital;
+    rr:objectMap [
+        rr:parentTriplesMap <#CapitalCityMapping>;
+        rr:joinCondition[
+        rr:child "Capital/Major City";
+        rr:parent "Capital/Major City"]
+        ]
+    ];
+
+   rr:predicateObjectMap[
+   rr:predicate ppl:contains;
+   rr:objectMap[
+   rr:parentTriplesMap <#CityMapping>;
+   ]
+   ];
+
+   rr:predicateObjectMap[
+   rr:predicate ppl:contains;
+   rr:objectMap[
+   rr:parentTriplesMap <#CapitalCityMapping>;
+   ]
+   ];
+
+  rr:predicateObjectMap [
+  rr:predicate ppl:size;
+  rr:objectMap [
+    rml:reference "Land Area(Km2)";
+    rr:datatype xsd:string]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ppl:population;
+    rr:objectMap [
+      rml:reference "Population";
+      rr:datatype xsd:integer
+    ]
+  ];
+
+  rr:predicateObjectMap [
+  rr:predicate ppl:GDP;
+    rr:objectMap [
+        rml:reference "GDP";
+        rr:datatype xsd:float]
+    ].
+
+<#PowerPlantMapping> a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "resources/processed/PowerPlantDataset.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [
+    rr:template "http://powerplant.example.com/{id}";
+    rr:class ppl:PowerPlant
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ppl:name;
+    rr:objectMap [
+      rml:reference "name of powerplant"
+    ]
+  ];
+
+ rr:predicateObjectMap [
+    rr:predicate ppl:capacity;
+    rr:objectMap [
+      rml:reference "capacity in MW";
+      rr:datatype xsd:float
+    ]
+  ];
+
+ rr:predicateObjectMap [
+    rr:predicate geo:lat;
+    rr:objectMap [
+        rml:reference "latitude"
+    ]
+  ];
+
+ rr:predicateObjectMap [
+     rr:predicate geo:long;
+        rr:objectMap [
+            rml:reference "longitude"
+        ]
+    ];
+
+
+ rr:predicateObjectMap [
+    rr:predicate lcc-lr:isIdentifiedBy;
+    rr:objectMap [
+      rr:template "https://www.omg.org/spec/LCC/Countries/ISO3166-1-CountryCodes/{country code}"
+    ]
+  ];
+
+    rr:predicateObjectMap [
+        rr:predicate ppl:inCountry;
+        rr:objectMap [
+        rr:parentTriplesMap <#CountryMapping>;
+        rr:joinCondition[
+        rr:child "country_long";
+        rr:parent "Country"]
+        ]
+    ];
+   rr:predicateObjectMap [
+        rr:predicate ppl:generation_gwh;
+        rr:objectMap [
+        rml:reference "estimated_generation_gwh_2021"
+        ]
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate ppl:owner_name;
+        rr:objectMap [
+        rml:reference "owner of plant"
+        ]
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate ppl:primary_fuel;
+        rr:objectMap [
+        rml:reference "primary_fuel"
+        ]
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate ppl:secondary_fuel;
+        rr:objectMap [
+        rml:reference "secondary fuel"
+        ]
+    ].
+
+
