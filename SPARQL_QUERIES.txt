@@ -1,0 +1,31 @@
+PREFIX ppl:  <http://powerplant.example.com/schema/>
+
+select DISTINCT ?country ?gdp where {
+    ?country ppl:hasPlant ?plant.
+    ?country ppl:GDP ?gdp.
+    ?plant ppl:primary_fuel "Solar".
+}
+
+
+###################################################
+
+PREFIX ppl:  <http://powerplant.example.com/schema/>
+select ?continent (sum(?gdp) as ?continent_GDP) (sum(?pop) as ?continent_population) (?continent_GDP/?continent_population as ?per_capita_GDP) where {
+	?continent ppl:contains ?country.
+    ?continent a ppl:Continent.
+    ?country a ppl:Country.
+	?country ppl:GDP ?gdp.
+	?country ppl:population ?pop.
+    
+} GROUP BY ?continent ORDER BY DESC(?per_capita_GDP)
+
+
+###################################################
+
+PREFIX ppl:  <http://powerplant.example.com/schema/>
+
+select ?country (count(?plant) as ?total_power_plants) (sum(?cap) as ?total_capacity_MW)where {
+    ?country ppl:hasPlant ?plant.
+    ?plant ppl:capacity ?cap.
+    
+} GROUP BY ?country ORDER BY DESC(?total_power_plants)
